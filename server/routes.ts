@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./pg-storage";
 import { loginSchema, createUserSchema } from "@shared/schema";
 import Papa from "papaparse";
 import type {
@@ -21,13 +21,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { email, password } = result.data;
-      const user = await storage.getUserByEmail(email);
+      
+      // Use password validation with bcrypt
+      const user = await storage.validatePassword(email, password);
 
       if (!user) {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
-
-      if (user.password !== password) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
@@ -36,7 +34,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Return user without password
-      const { password: _, ...safeUser } = user;
+      const { password: _, passwordHash: __, ...safeUser } = user;
       return res.json({ user: safeUser });
     } catch (error) {
       console.error("Login error:", error);
@@ -57,7 +55,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "User not found" });
     }
 
-    const { password: _, ...safeUser } = user;
+    const { password: _, passwordHash: __, ...safeUser } = user;
     return res.json({ user: safeUser });
   });
 
