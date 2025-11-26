@@ -26,6 +26,7 @@ Baraka OS is a full-stack TypeScript application featuring a React frontend with
 │   ├── storage.ts       # Data storage layer (in-memory)
 │   └── vite.ts          # Vite dev server setup
 ├── shared/              # Shared code between client/server
+│   ├── modules.ts       # Centralized module/department configuration (single source of truth)
 │   ├── schema.ts        # Database schema and types
 │   └── templates.ts     # Template definitions
 └── attached_assets/     # Static assets
@@ -65,6 +66,40 @@ The project is configured for Replit Autoscale deployment:
 - Build: `npm run build`
 - Start: `npm start`
 
+## Centralized Modules Configuration
+
+The application uses a single source of truth for department/module configuration in `shared/modules.ts`. This ensures consistency across the entire application.
+
+### How to Add a New Module/Department
+
+1. Add the module config to `MODULES_CONFIG` array in `shared/modules.ts`:
+```typescript
+{
+  id: "new_module",
+  label: "New Module",
+  icon: "IconName",
+  basePath: "/new-module",
+  subItems: [
+    { id: "dashboard", label: "Dashboard", path: "/new-module", icon: "LayoutDashboard" },
+  ],
+}
+```
+
+2. The following are automatically updated:
+   - `DEPARTMENTS` array in schema (derived from MODULES_CONFIG)
+   - `DEPARTMENT_LABELS` (derived from MODULES_CONFIG)
+   - User Management department dropdown
+   - Auth context module-to-department mapping
+
+3. Manual updates needed:
+   - Add the sidebar section in `client/src/components/app-sidebar.tsx`
+   - Create the page components for the new module
+
+### Module Access Control
+- Uses `canAccessModule(moduleId)` function from auth context
+- Supports multi-department access (users can belong to multiple departments)
+- Super admins can access all modules
+
 ## Recent Changes (November 26, 2025)
 - Installed all project dependencies
 - Configured Vite for Replit environment (host: 0.0.0.0, port: 5000)
@@ -84,3 +119,9 @@ The project is configured for Replit Autoscale deployment:
   - Table displays multiple departments as separate badges
   - Schema updated to store departments as JSON array alongside legacy department field
   - Example: John Engineer has access to both Engineering and Performance modules
+- Created centralized modules configuration system:
+  - Single source of truth in `shared/modules.ts`
+  - `DEPARTMENTS` array derived from centralized config
+  - `DEPARTMENT_LABELS` derived from centralized config
+  - Auth context dynamically builds module-to-department mapping
+  - User Management imports labels from centralized config
