@@ -15,6 +15,21 @@ export type Department = typeof DEPARTMENTS[number];
 // Re-export for convenience
 export { DEPARTMENT_LABELS } from "./modules";
 
+// Employee type for the centralized employee directory
+export interface Employee {
+  employeeId: string;
+  userId: string;
+  name: string;
+  firstName: string;
+  lastName: string;
+  department: string | null;
+  position: string | null;
+  managerId: string | null;
+  managerName: string | null;
+  email?: string | null;
+  isLinkedToUser: boolean;
+}
+
 // Users table with roles and departments
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

@@ -1,4 +1,5 @@
-import { type User, type SafeUser, type CreateUser, type ReconciliationResult, type ReconciliationRun } from "@shared/schema";
+import { type User, type SafeUser, type CreateUser, type ReconciliationResult, type ReconciliationRun, type Employee } from "@shared/schema";
+import { EMPLOYEES_DATA, normalizeEmployeeDepartment } from "@shared/employees-data";
 import { randomUUID } from "crypto";
 
 interface ReconciliationRunData {
@@ -25,6 +26,13 @@ export interface IStorage {
   getAllUsers(): Promise<SafeUser[]>;
   updateUser(id: string, updates: Partial<CreateUser>): Promise<SafeUser | undefined>;
   deleteUser(id: string): Promise<boolean>;
+  // Employee methods
+  getAllEmployees(): Promise<Employee[]>;
+  searchEmployees(query: string): Promise<Employee[]>;
+  getEmployeeById(employeeId: string): Promise<Employee | undefined>;
+  getEmployeeByUserId(userId: string): Promise<Employee | undefined>;
+  getDirectReports(employeeId: string): Promise<Employee[]>;
+  linkEmployeeToUser(employeeId: string, userEmail: string): Promise<void>;
   // Reconciliation methods
   saveReconciliationRun(run: ReconciliationRunData, results: ReconciliationResult[]): Promise<number>;
   getAllReconciliationRuns(): Promise<ReconciliationRun[]>;
@@ -44,14 +52,42 @@ interface StoredReconciliationRun extends ReconciliationRun {
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
+  private employees: Map<string, Employee>;
+  private employeeEmailLinks: Map<string, string>; // employeeId -> email
   private reconciliationRuns: Map<number, StoredReconciliationRun>;
   private nextReconciliationId: number;
 
   constructor() {
     this.users = new Map();
+    this.employees = new Map();
+    this.employeeEmailLinks = new Map();
     this.reconciliationRuns = new Map();
     this.nextReconciliationId = 1;
+    this.initializeEmployees();
     this.initializeMockUsers();
+  }
+
+  private initializeEmployees() {
+    for (const emp of EMPLOYEES_DATA) {
+      const nameParts = emp.name.split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ');
+      
+      const employee: Employee = {
+        employeeId: emp.employeeId,
+        userId: emp.userId,
+        name: emp.name,
+        firstName,
+        lastName,
+        department: normalizeEmployeeDepartment(emp.department),
+        position: emp.position || null,
+        managerId: emp.managerId,
+        managerName: emp.manager,
+        email: null,
+        isLinkedToUser: false,
+      };
+      this.employees.set(emp.employeeId, employee);
+    }
   }
 
   private initializeMockUsers() {
@@ -226,6 +262,44 @@ export class MemStorage implements IStorage {
 
   async deleteUser(id: string): Promise<boolean> {
     return this.users.delete(id);
+  }
+
+  // Employee methods
+  async getAllEmployees(): Promise<Employee[]> {
+    return Array.from(this.employees.values());
+  }
+
+  async searchEmployees(query: string): Promise<Employee[]> {
+    const lowerQuery = query.toLowerCase();
+    return Array.from(this.employees.values()).filter((emp) =>
+      emp.name.toLowerCase().includes(lowerQuery)
+    );
+  }
+
+  async getEmployeeById(employeeId: string): Promise<Employee | undefined> {
+    return this.employees.get(employeeId);
+  }
+
+  async getEmployeeByUserId(userId: string): Promise<Employee | undefined> {
+    return Array.from(this.employees.values()).find(
+      (emp) => emp.userId === userId
+    );
+  }
+
+  async getDirectReports(employeeId: string): Promise<Employee[]> {
+    return Array.from(this.employees.values()).filter(
+      (emp) => emp.managerId === employeeId
+    );
+  }
+
+  async linkEmployeeToUser(employeeId: string, userEmail: string): Promise<void> {
+    const employee = this.employees.get(employeeId);
+    if (employee) {
+      employee.email = userEmail;
+      employee.isLinkedToUser = true;
+      this.employees.set(employeeId, employee);
+      this.employeeEmailLinks.set(employeeId, userEmail);
+    }
   }
 
   // Reconciliation methods

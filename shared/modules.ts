@@ -97,6 +97,42 @@ export const MODULES_CONFIG: ModuleConfig[] = [
       { id: "finance-reconciliation", label: "Deposit Reconciliation", path: "/finance/reconciliation", icon: "FileSpreadsheet" },
     ],
   },
+  {
+    id: "design",
+    label: "Design",
+    icon: "Palette",
+    basePath: "/design",
+    subItems: [
+      { id: "design-dashboard", label: "Dashboard", path: "/design", icon: "LayoutDashboard" },
+    ],
+  },
+  {
+    id: "product",
+    label: "Product",
+    icon: "Package",
+    basePath: "/product",
+    subItems: [
+      { id: "product-dashboard", label: "Dashboard", path: "/product", icon: "LayoutDashboard" },
+    ],
+  },
+  {
+    id: "growth",
+    label: "Growth",
+    icon: "TrendingUp",
+    basePath: "/growth",
+    subItems: [
+      { id: "growth-dashboard", label: "Dashboard", path: "/growth", icon: "LayoutDashboard" },
+    ],
+  },
+  {
+    id: "executive",
+    label: "Executive",
+    icon: "Crown",
+    basePath: "/executive",
+    subItems: [
+      { id: "executive-dashboard", label: "Dashboard", path: "/executive", icon: "LayoutDashboard" },
+    ],
+  },
 ];
 
 export const DEPARTMENT_IDS = MODULES_CONFIG.map((m) => m.id) as readonly string[];

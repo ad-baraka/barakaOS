@@ -1,0 +1,89 @@
+Here's the updated list with those corrections:
+
+| # | Name | Department | Manager |
+|---|------|------------|---------|
+| 1 | Aleksa Spasić | Engineering | Vladimir Vasic |
+| 2 | Aleksandar Pejaković | Engineering | David Farg |
+| 3 | Alexandre Jose Duarte | Engineering | David Farg |
+| 4 | Aniket Katyal | Engineering | Vladimir Vasic |
+| 5 | Anil Dabas | Engineering (Director of Engineering) | Feras Jalbout |
+| 6 | Artur Mineev | Design | Feras Jalbout |
+| 7 | Batuhan Göbekli | Engineering | David Farg |
+| 8 | Benjamin Leibeck | — | Feras Jalbout |
+| 9 | Charalampos Chatzitheodosiou | Finance | Feras Jalbout |
+| 10 | Chetan Goyal | Product | Feras Jalbout |
+| 11 | Daria Turilova | Design | Artur Mineev |
+| 12 | David Farg | Engineering | Anil Dabas |
+| 13 | Dzmitry Harlach | Engineering | Vladimir Vasic |
+| 14 | Fachrul Choliluddin | Engineering | Anil Dabas |
+| 15 | Feras Jalbout | Executive | — (CEO/Top) |
+| 16 | Gautam Palukuri | Product | Feras Jalbout |
+| 17 | Hammad Ashraf | Growth | Rafay Qureshi |
+| 18 | John Vitalo | Executive | Feras Jalbout |
+| 19 | Merryl Jacob | — | Feras Jalbout |
+| 20 | Mohamed Ali Ibrahim Moawad | Engineering | Vladimir Vasic |
+| 21 | Muna Salah | Compliance | Feras Jalbout |
+| 22 | Nadine Asad | — | Rafay Qureshi |
+| 23 | Omar Elderaa | Design | Rafay Qureshi |
+| 24 | Petar Marković | — | Vladimir Vasic |
+| 25 | Prateek Sharma | Engineering | Zihnican Beğburs |
+| 26 | Prateek Kushla Nand Saklani | Engineering | Anil Dabas |
+| 27 | Qamar Tahboub | Growth | Rafay Qureshi |
+| 28 | Raad Alhammouri | Customer Support | Feras Jalbout |
+| 29 | Rafay Qureshi | Growth | Feras Jalbout |
+| 30 | Rhea Shibu | Finance | Charalampos Chatzitheodosiou |
+| 31 | Robert Zuljevic | Engineering | David Farg |
+| 32 | Shuming Fan | Growth | Rafay Qureshi |
+| 33 | Sidra Fatima | — | Rafay Qureshi |
+| 34 | Svetlin Mollov | Engineering | Vladimir Vasic |
+| 35 | Vasa Kotarlić | Engineering | David Farg |
+| 36 | Vivek Selvarajan | Engineering | Zihnican Beğburs |
+| 37 | Vladimir Vasic | Engineering | Anil Dabas |
+| 38 | Zihnican Beğburs | Engineering | Anil Dabas |
+
+---
+
+## Updated JSON
+
+```json
+[
+  {"name": "Aleksa Spasić", "department": "Engineering", "manager": "Vladimir Vasic"},
+  {"name": "Aleksandar Pejaković", "department": "Engineering", "manager": "David Farg"},
+  {"name": "Alexandre Jose Duarte", "department": "Engineering", "manager": "David Farg"},
+  {"name": "Aniket Katyal", "department": "Engineering", "manager": "Vladimir Vasic"},
+  {"name": "Anil Dabas", "department": "Engineering", "position": "Director of Engineering", "manager": "Feras Jalbout"},
+  {"name": "Artur Mineev", "department": "Design", "manager": "Feras Jalbout"},
+  {"name": "Batuhan Göbekli", "department": "Engineering", "manager": "David Farg"},
+  {"name": "Benjamin Leibeck", "department": null, "manager": "Feras Jalbout"},
+  {"name": "Charalampos Chatzitheodosiou", "department": "Finance", "manager": "Feras Jalbout"},
+  {"name": "Chetan Goyal", "department": "Product", "manager": "Feras Jalbout"},
+  {"name": "Daria Turilova", "department": "Design", "manager": "Artur Mineev"},
+  {"name": "David Farg", "department": "Engineering", "manager": "Anil Dabas"},
+  {"name": "Dzmitry Harlach", "department": "Engineering", "manager": "Vladimir Vasic"},
+  {"name": "Fachrul Choliluddin", "department": "Engineering", "manager": "Anil Dabas"},
+  {"name": "Feras Jalbout", "department": "Executive", "manager": null},
+  {"name": "Gautam Palukuri", "department": "Product", "manager": "Feras Jalbout"},
+  {"name": "Hammad Ashraf", "department": "Growth", "manager": "Rafay Qureshi"},
+  {"name": "John Vitalo", "department": "Executive", "manager": "Feras Jalbout"},
+  {"name": "Merryl Jacob", "department": null, "manager": "Feras Jalbout"},
+  {"name": "Mohamed Ali Ibrahim Moawad", "department": "Engineering", "manager": "Vladimir Vasic"},
+  {"name": "Muna Salah", "department": "Compliance", "manager": "Feras Jalbout"},
+  {"name": "Nadine Asad", "department": null, "manager": "Rafay Qureshi"},
+  {"name": "Omar Elderaa", "department": "Design", "manager": "Rafay Qureshi"},
+  {"name": "Petar Marković", "department": null, "manager": "Vladimir Vasic"},
+  {"name": "Prateek Sharma", "department": "Engineering", "manager": "Zihnican Beğburs"},
+  {"name": "Prateek Kushla Nand Saklani", "department": "Engineering", "manager": "Anil Dabas"},
+  {"name": "Qamar Tahboub", "department": "Growth", "manager": "Rafay Qureshi"},
+  {"name": "Raad Alhammouri", "department": "Customer Support", "manager": "Feras Jalbout"},
+  {"name": "Rafay Qureshi", "department": "Growth", "manager": "Feras Jalbout"},
+  {"name": "Rhea Shibu", "department": "Finance", "manager": "Charalampos Chatzitheodosiou"},
+  {"name": "Robert Zuljevic", "department": "Engineering", "manager": "David Farg"},
+  {"name": "Shuming Fan", "department": "Growth", "manager": "Rafay Qureshi"},
+  {"name": "Sidra Fatima", "department": null, "manager": "Rafay Qureshi"},
+  {"name": "Svetlin Mollov", "department": "Engineering", "manager": "Vladimir Vasic"},
+  {"name": "Vasa Kotarlić", "department": "Engineering", "manager": "David Farg"},
+  {"name": "Vivek Selvarajan", "department": "Engineering", "manager": "Zihnican Beğburs"},
+  {"name": "Vladimir Vasic", "department": "Engineering", "manager": "Anil Dabas"},
+  {"name": "Zihnican Beğburs", "department": "Engineering", "manager": "Anil Dabas"}
+]
+```
