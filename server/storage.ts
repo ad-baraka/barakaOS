@@ -64,6 +64,7 @@ export class MemStorage implements IStorage {
       lastName: "Admin",
       role: "super_admin",
       department: null,
+      departments: null,
       designation: "System Administrator",
       isActive: true,
       createdAt: new Date(),
@@ -71,7 +72,7 @@ export class MemStorage implements IStorage {
     };
     this.users.set(superAdmin.id, superAdmin);
 
-    // Engineering Admin
+    // Engineering Admin - has access to Engineering AND Performance
     const engineeringAdmin: User = {
       id: "2",
       email: "eng.admin@baraka.com",
@@ -80,6 +81,7 @@ export class MemStorage implements IStorage {
       lastName: "Engineer",
       role: "admin",
       department: "engineering",
+      departments: JSON.stringify(["engineering", "performance"]),
       designation: "Engineering Manager",
       isActive: true,
       createdAt: new Date(),
@@ -96,6 +98,7 @@ export class MemStorage implements IStorage {
       lastName: "Resources",
       role: "admin",
       department: "human_resources",
+      departments: JSON.stringify(["human_resources"]),
       designation: "HR Manager",
       isActive: true,
       createdAt: new Date(),
@@ -112,6 +115,7 @@ export class MemStorage implements IStorage {
       lastName: "Marketing",
       role: "admin",
       department: "marketing",
+      departments: JSON.stringify(["marketing"]),
       designation: "Marketing Director",
       isActive: true,
       createdAt: new Date(),
@@ -128,6 +132,7 @@ export class MemStorage implements IStorage {
       lastName: "Compliance",
       role: "admin",
       department: "compliance",
+      departments: JSON.stringify(["compliance"]),
       designation: "Compliance Officer",
       isActive: true,
       createdAt: new Date(),
@@ -144,6 +149,7 @@ export class MemStorage implements IStorage {
       lastName: "Developer",
       role: "member",
       department: "engineering",
+      departments: JSON.stringify(["engineering"]),
       designation: "Software Developer",
       isActive: true,
       createdAt: new Date(),
@@ -172,7 +178,8 @@ export class MemStorage implements IStorage {
       firstName: userData.firstName,
       lastName: userData.lastName,
       role: userData.role,
-      department: userData.department || null,
+      department: userData.departments?.[0] || userData.department || null,
+      departments: userData.departments ? JSON.stringify(userData.departments) : null,
       designation: userData.designation || null,
       isActive: true,
       createdAt: now,
@@ -193,6 +200,8 @@ export class MemStorage implements IStorage {
     const updatedUser: User = {
       ...user,
       ...updates,
+      department: updates.departments?.[0] || updates.department || user.department,
+      departments: updates.departments ? JSON.stringify(updates.departments) : user.departments,
       updatedAt: new Date(),
     };
     this.users.set(id, updatedUser);

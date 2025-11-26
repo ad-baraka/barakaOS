@@ -6,6 +6,7 @@ import { USER_ROLES, DEPARTMENTS } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -51,6 +52,17 @@ const DEPARTMENT_LABELS: Record<Department, string> = {
   analytics: "Analytics",
   finance: "Finance",
 };
+
+function parseDepartments(user: SafeUser): Department[] {
+  if (user.departments) {
+    try {
+      return JSON.parse(user.departments as string) as Department[];
+    } catch {
+      return user.department ? [user.department as Department] : [];
+    }
+  }
+  return user.department ? [user.department as Department] : [];
+}
 
 export default function UserManagement() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -184,9 +196,19 @@ export default function UserManagement() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {user.department
-                        ? DEPARTMENT_LABELS[user.department as Department] || user.department
-                        : "—"}
+                      {(() => {
+                        const depts = parseDepartments(user);
+                        if (depts.length === 0) return "—";
+                        return (
+                          <div className="flex flex-wrap gap-1">
+                            {depts.map((dept) => (
+                              <Badge key={dept} variant="outline" className="text-xs">
+                                {DEPARTMENT_LABELS[dept] || dept}
+                              </Badge>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       <Badge variant={user.isActive ? "outline" : "destructive"}>
@@ -255,19 +277,32 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     role: (user?.role as UserRole) || "member",
-    department: (user?.department as Department) || null,
+    departments: user ? parseDepartments(user) : [] as Department[],
     designation: user?.designation || "",
   });
+
+  const handleDepartmentToggle = (dept: Department, checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      departments: checked
+        ? [...prev.departments, dept]
+        : prev.departments.filter((d) => d !== dept),
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const data: CreateUser = {
-      ...formData,
-      department: formData.role === "super_admin" ? null : formData.department,
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      role: formData.role,
+      departments: formData.role === "super_admin" ? [] : formData.departments,
+      designation: formData.designation,
     };
-    // Only include password if creating or if it was changed
     if (!user && !data.password) {
-      return; // Password required for new users
+      return;
     }
     if (user && !formData.password) {
       delete (data as any).password;
@@ -362,24 +397,31 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
 
         {formData.role !== "super_admin" && (
           <div className="space-y-2">
-            <Label htmlFor="department">Department</Label>
-            <Select
-              value={formData.department || ""}
-              onValueChange={(value: Department) =>
-                setFormData({ ...formData, department: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select department" />
-              </SelectTrigger>
-              <SelectContent>
-                {DEPARTMENTS.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
+            <Label>Departments (select one or more)</Label>
+            <div className="grid grid-cols-2 gap-2 p-3 border rounded-md max-h-48 overflow-y-auto">
+              {DEPARTMENTS.map((dept) => (
+                <div key={dept} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`dept-${dept}`}
+                    checked={formData.departments.includes(dept)}
+                    onCheckedChange={(checked) =>
+                      handleDepartmentToggle(dept, checked === true)
+                    }
+                  />
+                  <label
+                    htmlFor={`dept-${dept}`}
+                    className="text-sm cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
                     {DEPARTMENT_LABELS[dept]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  </label>
+                </div>
+              ))}
+            </div>
+            {formData.departments.length === 0 && (
+              <p className="text-xs text-muted-foreground">
+                Please select at least one department
+              </p>
+            )}
           </div>
         )}
 

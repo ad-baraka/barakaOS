@@ -28,7 +28,8 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   role: text("role").notNull().default("member"), // super_admin, admin, member
-  department: text("department"), // null for super_admin who can access all
+  department: text("department"), // deprecated: use departments instead
+  departments: text("departments"), // JSON array of departments - allows multi-department access
   designation: text("designation"), // job title from org chart
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -47,7 +48,8 @@ export const createUserSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   role: z.enum(USER_ROLES),
-  department: z.enum(DEPARTMENTS).nullable().optional(),
+  department: z.enum(DEPARTMENTS).nullable().optional(), // deprecated: use departments
+  departments: z.array(z.enum(DEPARTMENTS)).optional(), // allows multi-department access
   designation: z.string().optional(),
 });
 
