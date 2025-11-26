@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { SafeUser, Department } from "@shared/schema";
+import { MODULES_CONFIG } from "@shared/modules";
 
 interface AuthContextType {
   user: SafeUser | null;
@@ -12,21 +13,48 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Map sidebar modules to department values
-const MODULE_TO_DEPARTMENT: Record<string, Department | null> = {
-  "human_resources": "human_resources",
-  "hr": "human_resources",
-  "performance": "performance",
-  "marketing": "marketing",
-  "customer_service": "customer_service",
-  "customer-service": "customer_service",
-  "compliance": "compliance",
-  "engineering": "engineering",
-  "analytics": "analytics",
-  "finance": "finance",
-  "user_management": null, // Only super_admin
-  "settings": null, // Everyone
-};
+function buildModuleToDepartmentMap(): Record<string, string | null> {
+  const map: Record<string, string | null> = {
+    "user_management": null,
+    "user-management": null,
+    "settings": null,
+  };
+  
+  for (const mod of MODULES_CONFIG) {
+    map[mod.id] = mod.id;
+    const altKey = mod.id.replace("_", "-");
+    if (altKey !== mod.id) {
+      map[altKey] = mod.id;
+    }
+    const pathKey = mod.basePath.replace("/", "");
+    if (pathKey && pathKey !== mod.id) {
+      map[pathKey] = mod.id;
+    }
+  }
+  
+  return map;
+}
+
+const MODULE_TO_DEPARTMENT = buildModuleToDepartmentMap();
+
+function getUserDepartments(user: SafeUser): string[] {
+  if (user.departments) {
+    if (Array.isArray(user.departments)) {
+      return user.departments as string[];
+    }
+    if (typeof user.departments === 'string') {
+      try {
+        const parsed = JSON.parse(user.departments);
+        if (Array.isArray(parsed)) {
+          return parsed as string[];
+        }
+      } catch {
+        // Fall through
+      }
+    }
+  }
+  return user.department ? [user.department] : [];
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SafeUser | null>(null);
@@ -87,13 +115,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (module === "user_management" || module === "user-management") return false;
 
     // Get the department for this module
-    const moduleDepartment = MODULE_TO_DEPARTMENT[module.toLowerCase().replace("-", "_")];
+    const normalizedModule = module.toLowerCase().replace("-", "_");
+    const moduleDepartment = MODULE_TO_DEPARTMENT[normalizedModule];
 
     // If module doesn't map to a department, deny access
     if (moduleDepartment === undefined) return false;
+    
+    // Null means only super_admin (already handled above)
+    if (moduleDepartment === null) return false;
 
-    // Admin and member can only access their department
-    return user.department === moduleDepartment;
+    // Check if user has access to this department (supports multi-department)
+    const userDepartments = getUserDepartments(user);
+    return userDepartments.includes(moduleDepartment);
   };
 
   return (

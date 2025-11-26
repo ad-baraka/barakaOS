@@ -2,23 +2,18 @@ import { sql } from "drizzle-orm";
 import { pgTable, text, varchar, decimal, date, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { MODULES_CONFIG, DEPARTMENT_LABELS } from "./modules";
 
 // User roles
 export const USER_ROLES = ["super_admin", "admin", "member"] as const;
 export type UserRole = typeof USER_ROLES[number];
 
-// Departments matching sidebar modules
-export const DEPARTMENTS = [
-  "human_resources",
-  "performance",
-  "marketing",
-  "customer_service",
-  "compliance",
-  "engineering",
-  "analytics",
-  "finance",
-] as const;
+// Departments - derived from centralized modules config (single source of truth)
+export const DEPARTMENTS = MODULES_CONFIG.map((m) => m.id) as unknown as readonly [string, ...string[]];
 export type Department = typeof DEPARTMENTS[number];
+
+// Re-export for convenience
+export { DEPARTMENT_LABELS } from "./modules";
 
 // Users table with roles and departments
 export const users = pgTable("users", {

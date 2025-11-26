@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { SafeUser, Department, UserRole, CreateUser } from "@shared/schema";
-import { USER_ROLES, DEPARTMENTS } from "@shared/schema";
+import { USER_ROLES, DEPARTMENTS, DEPARTMENT_LABELS } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,16 +42,6 @@ const ROLE_LABELS: Record<UserRole, string> = {
   member: "Member",
 };
 
-const DEPARTMENT_LABELS: Record<Department, string> = {
-  human_resources: "Human Resources",
-  performance: "Performance",
-  marketing: "Marketing",
-  customer_service: "Customer Service",
-  compliance: "Compliance",
-  engineering: "Engineering",
-  analytics: "Analytics",
-  finance: "Finance",
-};
 
 function parseDepartments(user: SafeUser): Department[] {
   const depts = user.departments;
