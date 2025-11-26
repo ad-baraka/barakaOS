@@ -78,3 +78,9 @@ The project is configured for Replit Autoscale deployment:
   - Consistent `space-y-6` spacing between sections
   - Responsive grid layouts: `grid-cols-1 md:grid-cols-2 lg:grid-cols-4`
   - Consistent `mt-1` spacing for subtitles
+- Implemented multi-department selection in User Management:
+  - Users can now be assigned to multiple departments (e.g., Engineering AND Performance)
+  - Department selection uses checkboxes for multi-select
+  - Table displays multiple departments as separate badges
+  - Schema updated to store departments as JSON array alongside legacy department field
+  - Example: John Engineer has access to both Engineering and Performance modules
