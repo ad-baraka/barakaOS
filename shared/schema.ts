@@ -3,20 +3,65 @@ import { pgTable, text, varchar, decimal, date, timestamp, boolean } from "drizz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users table (shared across modules)
+// User roles
+export const USER_ROLES = ["super_admin", "admin", "member"] as const;
+export type UserRole = typeof USER_ROLES[number];
+
+// Departments matching sidebar modules
+export const DEPARTMENTS = [
+  "human_resources",
+  "performance",
+  "marketing",
+  "customer_service",
+  "compliance",
+  "engineering",
+  "analytics",
+] as const;
+export type Department = typeof DEPARTMENTS[number];
+
+// Users table with roles and departments
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  role: text("role").notNull().default("member"), // super_admin, admin, member
+  department: text("department"), // null for super_admin who can access all
+  designation: text("designation"), // job title from org chart
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const createUserSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  role: z.enum(USER_ROLES),
+  department: z.enum(DEPARTMENTS).nullable().optional(),
+  designation: z.string().optional(),
+});
+
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type CreateUser = z.infer<typeof createUserSchema>;
+export type LoginCredentials = z.infer<typeof loginSchema>;
 export type User = typeof users.$inferSelect;
+
+// Safe user type without password
+export type SafeUser = Omit<User, "password">;
 
 // HR Module - Invitations
 export const invitations = pgTable("invitations", {
