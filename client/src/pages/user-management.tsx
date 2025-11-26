@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import type { SafeUser, Department, UserRole, CreateUser } from "@shared/schema";
+import type { SafeUser, Department, UserRole, CreateUser, Employee } from "@shared/schema";
 import { USER_ROLES, DEPARTMENTS, DEPARTMENT_LABELS } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,10 +31,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, UserPlus, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, UserPlus, Loader2, Search, Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const ROLE_LABELS: Record<UserRole, string> = {
   super_admin: "Super Admin",
@@ -270,6 +284,12 @@ interface UserFormProps {
 }
 
 function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [searchResults, setSearchResults] = useState<Employee[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   const [formData, setFormData] = useState({
     email: user?.email || "",
     password: "",
@@ -279,6 +299,49 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
     departments: user ? parseDepartments(user) : [] as Department[],
     designation: user?.designation || "",
   });
+
+  const searchEmployees = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const res = await apiRequest("GET", `/api/employees/search?q=${encodeURIComponent(query)}`);
+      const employees = await res.json();
+      setSearchResults(employees);
+    } catch (error) {
+      console.error("Error searching employees:", error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      if (searchQuery) {
+        searchEmployees(searchQuery);
+      }
+    }, 300);
+    return () => clearTimeout(debounce);
+  }, [searchQuery, searchEmployees]);
+
+  const handleEmployeeSelect = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setSearchOpen(false);
+    
+    const dept = employee.department as Department;
+    const departments: Department[] = dept && DEPARTMENTS.includes(dept) ? [dept] : [];
+    
+    setFormData({
+      ...formData,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      designation: employee.position || "",
+      departments,
+    });
+  };
 
   const handleDepartmentToggle = (dept: Department, checked: boolean) => {
     setFormData((prev) => ({
@@ -309,6 +372,8 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
     onSubmit(data);
   };
 
+  const isEditMode = !!user;
+
   return (
     <form onSubmit={handleSubmit}>
       <DialogHeader>
@@ -316,128 +381,228 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
         <DialogDescription>
           {user
             ? "Update user details and permissions"
-            : "Add a new user to the system"}
+            : "Search for an employee to add as a user"}
         </DialogDescription>
       </DialogHeader>
 
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-2 gap-4">
+        {!isEditMode && (
           <div className="space-y-2">
-            <Label htmlFor="firstName">First Name</Label>
-            <Input
-              id="firstName"
-              value={formData.firstName}
-              onChange={(e) =>
-                setFormData({ ...formData, firstName: e.target.value })
-              }
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              id="lastName"
-              value={formData.lastName}
-              onChange={(e) =>
-                setFormData({ ...formData, lastName: e.target.value })
-              }
-              required
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="password">
-            Password {user && "(leave blank to keep current)"}
-          </Label>
-          <Input
-            id="password"
-            type="password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            required={!user}
-            minLength={6}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="role">Role</Label>
-          <Select
-            value={formData.role}
-            onValueChange={(value: UserRole) =>
-              setFormData({ ...formData, role: value })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {USER_ROLES.map((role) => (
-                <SelectItem key={role} value={role}>
-                  {ROLE_LABELS[role]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {formData.role !== "super_admin" && (
-          <div className="space-y-2">
-            <Label>Departments (select one or more)</Label>
-            <div className="grid grid-cols-2 gap-2 p-3 border rounded-md max-h-48 overflow-y-auto">
-              {DEPARTMENTS.map((dept) => (
-                <div key={dept} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`dept-${dept}`}
-                    checked={formData.departments.includes(dept)}
-                    onCheckedChange={(checked) =>
-                      handleDepartmentToggle(dept, checked === true)
-                    }
+            <Label>Search Employee</Label>
+            <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={searchOpen}
+                  className="w-full justify-between"
+                >
+                  {selectedEmployee ? (
+                    <span className="flex items-center gap-2">
+                      <span>{selectedEmployee.name}</span>
+                      {selectedEmployee.department && (
+                        <Badge variant="secondary" className="text-xs">
+                          {DEPARTMENT_LABELS[selectedEmployee.department] || selectedEmployee.department}
+                        </Badge>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Search by name...</span>
+                  )}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="start">
+                <Command shouldFilter={false}>
+                  <CommandInput 
+                    placeholder="Type to search employees..." 
+                    value={searchQuery}
+                    onValueChange={setSearchQuery}
                   />
-                  <label
-                    htmlFor={`dept-${dept}`}
-                    className="text-sm cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {DEPARTMENT_LABELS[dept]}
-                  </label>
-                </div>
-              ))}
-            </div>
-            {formData.departments.length === 0 && (
+                  <CommandList>
+                    {isSearching && (
+                      <div className="flex items-center justify-center py-6">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </div>
+                    )}
+                    {!isSearching && searchQuery.length >= 2 && searchResults.length === 0 && (
+                      <CommandEmpty>No employee found.</CommandEmpty>
+                    )}
+                    {!isSearching && searchQuery.length < 2 && (
+                      <CommandEmpty>Type at least 2 characters to search.</CommandEmpty>
+                    )}
+                    {!isSearching && searchResults.length > 0 && (
+                      <CommandGroup heading="Employees">
+                        {searchResults.map((employee) => (
+                          <CommandItem
+                            key={employee.employeeId}
+                            value={employee.employeeId}
+                            onSelect={() => handleEmployeeSelect(employee)}
+                            className="cursor-pointer"
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedEmployee?.employeeId === employee.employeeId
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            <div className="flex flex-col">
+                              <span className="font-medium">{employee.name}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {employee.department && (DEPARTMENT_LABELS[employee.department] || employee.department)}
+                                {employee.position && ` • ${employee.position}`}
+                              </span>
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    )}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {selectedEmployee && (
               <p className="text-xs text-muted-foreground">
-                Please select at least one department
+                Employee ID: {selectedEmployee.employeeId} • Reports to: {selectedEmployee.managerName || "None"}
               </p>
             )}
           </div>
         )}
 
-        <div className="space-y-2">
-          <Label htmlFor="designation">Designation (Job Title)</Label>
-          <Input
-            id="designation"
-            value={formData.designation}
-            onChange={(e) =>
-              setFormData({ ...formData, designation: e.target.value })
-            }
-          />
-        </div>
+        {(isEditMode || selectedEmployee) && (
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, firstName: e.target.value })
+                  }
+                  required
+                  readOnly={!isEditMode && !!selectedEmployee}
+                  className={!isEditMode && selectedEmployee ? "bg-muted" : ""}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, lastName: e.target.value })
+                  }
+                  required
+                  readOnly={!isEditMode && !!selectedEmployee}
+                  className={!isEditMode && selectedEmployee ? "bg-muted" : ""}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                placeholder="Enter email address"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">
+                Password {user && "(leave blank to keep current)"}
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                required={!user}
+                minLength={6}
+                placeholder={user ? "Leave blank to keep current" : "Min 6 characters"}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Select
+                value={formData.role}
+                onValueChange={(value: UserRole) =>
+                  setFormData({ ...formData, role: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {USER_ROLES.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {ROLE_LABELS[role]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.role !== "super_admin" && (
+              <div className="space-y-2">
+                <Label>Departments (select one or more)</Label>
+                <div className="grid grid-cols-2 gap-2 p-3 border rounded-md max-h-48 overflow-y-auto">
+                  {DEPARTMENTS.map((dept) => (
+                    <div key={dept} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`dept-${dept}`}
+                        checked={formData.departments.includes(dept)}
+                        onCheckedChange={(checked) =>
+                          handleDepartmentToggle(dept, checked === true)
+                        }
+                      />
+                      <label
+                        htmlFor={`dept-${dept}`}
+                        className="text-sm cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {DEPARTMENT_LABELS[dept]}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                {formData.departments.length === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Please select at least one department
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="designation">Designation (Job Title)</Label>
+              <Input
+                id="designation"
+                value={formData.designation}
+                onChange={(e) =>
+                  setFormData({ ...formData, designation: e.target.value })
+                }
+                readOnly={!isEditMode && !!selectedEmployee}
+                className={!isEditMode && selectedEmployee ? "bg-muted" : ""}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       <DialogFooter>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button 
+          type="submit" 
+          disabled={isSubmitting || (!isEditMode && !selectedEmployee)}
+        >
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
