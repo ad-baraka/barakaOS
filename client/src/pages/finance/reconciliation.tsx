@@ -333,9 +333,12 @@ export default function ReconciliationPage() {
             />
           </div>
 
-          <div className="flex items-end gap-4">
-            <div className="space-y-4">
-              <Label htmlFor="value-date-filter" className="block">Value Date Filter</Label>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5 text-muted-foreground" />
+                <Label htmlFor="value-date-filter" className="text-base font-medium">Value Date Filter</Label>
+              </div>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -343,12 +346,11 @@ export default function ReconciliationPage() {
                     variant="outline"
                     size="lg"
                     className={cn(
-                      "w-[200px] justify-start text-left font-normal gap-2",
+                      "w-[200px] justify-start text-left font-normal",
                       !valueDateFilter && "text-muted-foreground"
                     )}
                     data-testid="button-date-picker"
                   >
-                    <CalendarIcon className="h-4 w-4" />
                     {valueDateFilter ? format(valueDateFilter, "dd/MM/yyyy") : "Select date"}
                   </Button>
                 </PopoverTrigger>
