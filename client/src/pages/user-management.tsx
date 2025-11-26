@@ -49,6 +49,7 @@ const DEPARTMENT_LABELS: Record<Department, string> = {
   compliance: "Compliance",
   engineering: "Engineering",
   analytics: "Analytics",
+  finance: "Finance",
 };
 
 export default function UserManagement() {
