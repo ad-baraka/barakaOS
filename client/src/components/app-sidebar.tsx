@@ -18,6 +18,11 @@ import {
   LineChart,
   UserCog,
   LogOut,
+  CheckSquare,
+  DollarSign,
+  MessageSquare,
+  Wallet,
+  FileSpreadsheet,
 } from "lucide-react";
 import {
   Sidebar,
@@ -52,6 +57,7 @@ export function AppSidebar() {
   const [isComplianceOpen, setIsComplianceOpen] = useState(location.startsWith("/compliance"));
   const [isEngineeringOpen, setIsEngineeringOpen] = useState(location.startsWith("/engineering"));
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(location.startsWith("/analytics"));
+  const [isFinanceOpen, setIsFinanceOpen] = useState(location.startsWith("/finance"));
   const [isSendInvitationOpen, setIsSendInvitationOpen] = useState(false);
   const { openInvitationWith } = useInvitation();
   const { user, canAccessModule, logout } = useAuth();
@@ -225,6 +231,46 @@ export function AppSidebar() {
                             </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="marketing-influencers">
+                          <SidebarMenuSubButton asChild isActive={location === "/marketing/influencers"}>
+                            <Link href="/marketing/influencers" data-testid="link-marketing-influencers">
+                              <Users className="h-4 w-4" />
+                              <span>Influencers</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="marketing-campaigns">
+                          <SidebarMenuSubButton asChild isActive={location === "/marketing/campaigns"}>
+                            <Link href="/marketing/campaigns" data-testid="link-marketing-campaigns">
+                              <Megaphone className="h-4 w-4" />
+                              <span>Campaigns</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="marketing-tasks">
+                          <SidebarMenuSubButton asChild isActive={location === "/marketing/tasks"}>
+                            <Link href="/marketing/tasks" data-testid="link-marketing-tasks">
+                              <CheckSquare className="h-4 w-4" />
+                              <span>Tasks</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="marketing-payouts">
+                          <SidebarMenuSubButton asChild isActive={location === "/marketing/payouts"}>
+                            <Link href="/marketing/payouts" data-testid="link-marketing-payouts">
+                              <DollarSign className="h-4 w-4" />
+                              <span>Payouts</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="marketing-messages">
+                          <SidebarMenuSubButton asChild isActive={location === "/marketing/messages"}>
+                            <Link href="/marketing/messages" data-testid="link-marketing-messages">
+                              <MessageSquare className="h-4 w-4" />
+                              <span>Messages</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>
@@ -330,6 +376,41 @@ export function AppSidebar() {
                             <Link href="/analytics" data-testid="link-analytics-dashboard">
                               <LayoutDashboard className="h-4 w-4" />
                               <span>Dashboard</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              )}
+
+              {/* Finance Module */}
+              {canAccessModule("finance") && (
+                <Collapsible open={isFinanceOpen} onOpenChange={setIsFinanceOpen} className="group/collapsible">
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton data-testid="button-finance">
+                        <Wallet className="h-4 w-4" />
+                        <span>Finance</span>
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        <SidebarMenuSubItem key="finance-dashboard">
+                          <SidebarMenuSubButton asChild isActive={location === "/finance"}>
+                            <Link href="/finance" data-testid="link-finance-dashboard">
+                              <LayoutDashboard className="h-4 w-4" />
+                              <span>Dashboard</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="finance-reconciliation">
+                          <SidebarMenuSubButton asChild isActive={location === "/finance/reconciliation"}>
+                            <Link href="/finance/reconciliation" data-testid="link-finance-reconciliation">
+                              <FileSpreadsheet className="h-4 w-4" />
+                              <span>Deposit Reconciliation</span>
                             </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>

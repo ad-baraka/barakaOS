@@ -25,8 +25,19 @@ import AdminCycleSetup from "@/pages/admin-cycle-setup";
 import HRDashboard from "@/pages/hr-dashboard";
 import HRDocuments from "@/pages/hr-documents";
 
+// Marketing Module Pages
+import MarketingDashboard from "@/pages/marketing/dashboard";
+import MarketingInfluencers from "@/pages/marketing/influencers";
+import MarketingCampaigns from "@/pages/marketing/campaigns";
+import MarketingTasks from "@/pages/marketing/tasks";
+import MarketingPayouts from "@/pages/marketing/payouts";
+import MarketingMessages from "@/pages/marketing/messages";
+
+// Finance Module Pages
+import FinanceDashboard from "@/pages/finance/dashboard";
+import FinanceReconciliation from "@/pages/finance/reconciliation";
+
 // Other Module Pages
-import MarketingDashboard from "@/pages/marketing-dashboard";
 import CustomerServiceDashboard from "@/pages/customer-service-dashboard";
 import ComplianceDashboard from "@/pages/compliance-dashboard";
 import EngineeringDashboard from "@/pages/engineering-dashboard";
@@ -119,6 +130,21 @@ function Router() {
       <Route path="/marketing">
         <ProtectedRoute component={MarketingDashboard} module="marketing" />
       </Route>
+      <Route path="/marketing/influencers">
+        <ProtectedRoute component={MarketingInfluencers} module="marketing" />
+      </Route>
+      <Route path="/marketing/campaigns">
+        <ProtectedRoute component={MarketingCampaigns} module="marketing" />
+      </Route>
+      <Route path="/marketing/tasks">
+        <ProtectedRoute component={MarketingTasks} module="marketing" />
+      </Route>
+      <Route path="/marketing/payouts">
+        <ProtectedRoute component={MarketingPayouts} module="marketing" />
+      </Route>
+      <Route path="/marketing/messages">
+        <ProtectedRoute component={MarketingMessages} module="marketing" />
+      </Route>
 
       {/* Customer Service Module Routes */}
       <Route path="/customer-service">
@@ -138,6 +164,14 @@ function Router() {
       {/* Baraka Analytics Module Routes */}
       <Route path="/analytics">
         <ProtectedRoute component={AnalyticsDashboard} module="analytics" />
+      </Route>
+
+      {/* Finance Module Routes */}
+      <Route path="/finance">
+        <ProtectedRoute component={FinanceDashboard} module="finance" />
+      </Route>
+      <Route path="/finance/reconciliation">
+        <ProtectedRoute component={FinanceReconciliation} module="finance" />
       </Route>
 
       {/* User Management - Super Admin only */}

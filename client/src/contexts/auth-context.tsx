@@ -23,6 +23,7 @@ const MODULE_TO_DEPARTMENT: Record<string, Department | null> = {
   "compliance": "compliance",
   "engineering": "engineering",
   "analytics": "analytics",
+  "finance": "finance",
   "user_management": null, // Only super_admin
   "settings": null, // Everyone
 };

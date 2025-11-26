@@ -1,5 +1,22 @@
-import { type User, type SafeUser, type CreateUser } from "@shared/schema";
+import { type User, type SafeUser, type CreateUser, type ReconciliationResult, type ReconciliationRun } from "@shared/schema";
 import { randomUUID } from "crypto";
+
+interface ReconciliationRunData {
+  bankStatementFilename: string | null;
+  databaseFilename: string | null;
+  valueDateFilter: string | null;
+  totalMatched: number;
+  totalBankOnly: number;
+  totalDatabaseOnly: number;
+  totalRecords: number;
+  totalBankCredit: number;
+  totalMetaBaseAmount: number;
+  totalDeductedAmount: number;
+  totalTransactionAmount: number;
+  checkoutAed: number;
+  checkoutUsd: number;
+  tapUsd: number;
+}
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -8,6 +25,11 @@ export interface IStorage {
   getAllUsers(): Promise<SafeUser[]>;
   updateUser(id: string, updates: Partial<CreateUser>): Promise<SafeUser | undefined>;
   deleteUser(id: string): Promise<boolean>;
+  // Reconciliation methods
+  saveReconciliationRun(run: ReconciliationRunData, results: ReconciliationResult[]): Promise<number>;
+  getAllReconciliationRuns(): Promise<ReconciliationRun[]>;
+  getReconciliationRunById(id: number): Promise<ReconciliationRun | undefined>;
+  getReconciliationResultsByRunId(id: number): Promise<ReconciliationResult[]>;
 }
 
 // Helper to remove password from user object
@@ -16,11 +38,19 @@ function toSafeUser(user: User): SafeUser {
   return safeUser;
 }
 
+interface StoredReconciliationRun extends ReconciliationRun {
+  results: ReconciliationResult[];
+}
+
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
+  private reconciliationRuns: Map<number, StoredReconciliationRun>;
+  private nextReconciliationId: number;
 
   constructor() {
     this.users = new Map();
+    this.reconciliationRuns = new Map();
+    this.nextReconciliationId = 1;
     this.initializeMockUsers();
   }
 
@@ -171,6 +201,39 @@ export class MemStorage implements IStorage {
 
   async deleteUser(id: string): Promise<boolean> {
     return this.users.delete(id);
+  }
+
+  // Reconciliation methods
+  async saveReconciliationRun(runData: ReconciliationRunData, results: ReconciliationResult[]): Promise<number> {
+    const id = this.nextReconciliationId++;
+    const run: StoredReconciliationRun = {
+      id,
+      createdAt: new Date().toISOString(),
+      ...runData,
+      results,
+    };
+    this.reconciliationRuns.set(id, run);
+    return id;
+  }
+
+  async getAllReconciliationRuns(): Promise<ReconciliationRun[]> {
+    const runs = Array.from(this.reconciliationRuns.values())
+      .map(({ results, ...run }) => run)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return runs;
+  }
+
+  async getReconciliationRunById(id: number): Promise<ReconciliationRun | undefined> {
+    const storedRun = this.reconciliationRuns.get(id);
+    if (!storedRun) return undefined;
+    const { results, ...run } = storedRun;
+    return run;
+  }
+
+  async getReconciliationResultsByRunId(id: number): Promise<ReconciliationResult[]> {
+    const storedRun = this.reconciliationRuns.get(id);
+    if (!storedRun) return [];
+    return storedRun.results;
   }
 }
 

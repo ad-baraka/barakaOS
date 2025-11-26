@@ -16,6 +16,7 @@ export const DEPARTMENTS = [
   "compliance",
   "engineering",
   "analytics",
+  "finance",
 ] as const;
 export type Department = typeof DEPARTMENTS[number];
 
@@ -170,3 +171,130 @@ export const updateDocumentTemplateSchema = insertDocumentTemplateSchema.partial
 export type InsertDocumentTemplate = z.infer<typeof insertDocumentTemplateSchema>;
 export type UpdateDocumentTemplate = z.infer<typeof updateDocumentTemplateSchema>;
 export type DocumentTemplate = typeof documentTemplates.$inferSelect;
+
+// ============================================================
+// Finance Module - Reconciliation Schemas
+// ============================================================
+
+// Bank Statement Row Schema
+export const bankStatementRowSchema = z.object({
+  "Account Number": z.string(),
+  "Transaction Date": z.string(),
+  "Value Date": z.string(),
+  "Narration": z.string(),
+  "Transaction Reference": z.string(),
+  "Debit": z.string(),
+  "Credit": z.string(),
+  "Running Balance": z.string(),
+  "Currency": z.string(),
+});
+
+export type BankStatementRow = z.infer<typeof bankStatementRowSchema>;
+
+// Database Row Schema
+export const databaseRowSchema = z.object({
+  created_at: z.string(),
+  original_currency: z.string(),
+  amount: z.string(),
+  deducted_amount_in_usd: z.string(),
+  total_amount_in_original_currency: z.string(),
+  deposit_id: z.string(),
+  user_id: z.string(),
+  fee_name: z.string(),
+  notification_id: z.string(),
+  fee_proportion_according_to_fee_name_if_tiered: z.string(),
+  fee_proportion_by_calculation: z.string(),
+  firstname: z.string(),
+  lastname: z.string(),
+  phonecountrycode: z.string(),
+  transaction_currency: z.string(),
+  transaction_amount: z.string(),
+  va_number: z.string(),
+  vam_reference_number: z.string(),
+});
+
+export type DatabaseRow = z.infer<typeof databaseRowSchema>;
+
+// Reconciliation Result Schema
+export const reconciliationResultSchema = z.object({
+  matchStatus: z.enum(["matched", "bank_only", "database_only"]),
+  transactionReference: z.string(),
+  bankData: bankStatementRowSchema.nullable(),
+  databaseData: databaseRowSchema.nullable(),
+});
+
+export type ReconciliationResult = z.infer<typeof reconciliationResultSchema>;
+
+// Currency breakdown for stats
+export const currencyStatsSchema = z.object({
+  bankCredit: z.number(),
+  transactionAmount: z.number(),
+  deductedAmount: z.number(),
+});
+
+export type CurrencyStats = z.infer<typeof currencyStatsSchema>;
+
+// Special transactions stats (INWARD CHECKOUT and TAP)
+export const specialTransactionsSchema = z.object({
+  checkoutAed: z.number(),
+  checkoutUsd: z.number(),
+  tapUsd: z.number(),
+});
+
+export type SpecialTransactions = z.infer<typeof specialTransactionsSchema>;
+
+// Reconciliation Statistics Schema
+export const reconciliationStatsSchema = z.object({
+  totalMatched: z.number(),
+  totalBankOnly: z.number(),
+  totalDatabaseOnly: z.number(),
+  totalRecords: z.number(),
+  totalBankCredit: z.number(),
+  totalMetaBaseAmount: z.number(),
+  totalDeductedAmount: z.number(),
+  totalTransactionAmount: z.number(),
+  byCurrency: z.record(z.string(), currencyStatsSchema),
+  specialTransactions: specialTransactionsSchema.optional(),
+});
+
+export type ReconciliationStats = z.infer<typeof reconciliationStatsSchema>;
+
+// Metadata for historical reconciliation
+export const reconciliationMetadataSchema = z.object({
+  id: z.number(),
+  createdAt: z.string(),
+  bankStatementFilename: z.string().nullable(),
+  databaseFilename: z.string().nullable(),
+  valueDateFilter: z.string().nullable(),
+});
+
+export type ReconciliationMetadata = z.infer<typeof reconciliationMetadataSchema>;
+
+// API Response Schema
+export const reconciliationResponseSchema = z.object({
+  results: z.array(reconciliationResultSchema),
+  stats: reconciliationStatsSchema,
+  metadata: reconciliationMetadataSchema.optional(),
+});
+
+export type ReconciliationResponse = z.infer<typeof reconciliationResponseSchema>;
+
+// Reconciliation Run type for history
+export interface ReconciliationRun {
+  id: number;
+  createdAt: string;
+  bankStatementFilename: string | null;
+  databaseFilename: string | null;
+  valueDateFilter: string | null;
+  totalMatched: number;
+  totalBankOnly: number;
+  totalDatabaseOnly: number;
+  totalRecords: number;
+  totalBankCredit: number;
+  totalMetaBaseAmount: number;
+  totalDeductedAmount: number;
+  totalTransactionAmount: number;
+  checkoutAed: number;
+  checkoutUsd: number;
+  tapUsd: number;
+}
