@@ -1,7 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { JoinerCard } from "@/components/joiner-card";
-import { InvitationDialog } from "@/components/invitation-dialog";
-import { TemplateSelector } from "@/components/template-selector";
+import { JoinerCard, InvitationDialog, TemplateSelector } from "@/components/hr";
 import { Users, FileText, CheckCircle, Clock, Send, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";

@@ -1,5 +1,4 @@
-import { StatusCard } from "@/components/status-card";
-import { ReviewCycleCard } from "@/components/review-cycle-card";
+import { StatusCard, ReviewCycleCard } from "@/components/performance";
 import { CheckCircle2, Clock, Target } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 

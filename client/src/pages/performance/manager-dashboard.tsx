@@ -1,9 +1,8 @@
-import { StatusCard } from "@/components/status-card";
-import { EmployeeTable } from "@/components/employee-table";
+import { StatusCard, EmployeeTable } from "@/components/performance";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CheckCircle2, Clock, AlertCircle, Search, Download, Loader2, Users } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/contexts/auth-context";
