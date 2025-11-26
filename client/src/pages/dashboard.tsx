@@ -4,10 +4,10 @@ import { CheckCircle2, Clock, Target } from "lucide-react";
 
 export default function Dashboard() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold">Welcome back, John</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground mt-1">
           Here's your performance review overview
         </p>
       </div>

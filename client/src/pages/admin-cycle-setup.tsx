@@ -47,7 +47,7 @@ export default function AdminCycleSetup() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-semibold">Create Review Cycle</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground mt-1">
           Set up a new performance review cycle
         </p>
       </div>
