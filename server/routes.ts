@@ -125,6 +125,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ============================================================
+  // Employee Directory Routes
+  // ============================================================
+
+  // Get all employees
+  app.get("/api/employees", async (req: Request, res: Response) => {
+    try {
+      const employees = await storage.getAllEmployees();
+      return res.json(employees);
+    } catch (error) {
+      console.error("Get employees error:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Search employees by name
+  app.get("/api/employees/search", async (req: Request, res: Response) => {
+    try {
+      const query = (req.query.q as string) || "";
+      if (query.length < 2) {
+        return res.json([]);
+      }
+      const employees = await storage.searchEmployees(query);
+      return res.json(employees);
+    } catch (error) {
+      console.error("Search employees error:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get employee by ID
+  app.get("/api/employees/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const employee = await storage.getEmployeeById(id);
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+      return res.json(employee);
+    } catch (error) {
+      console.error("Get employee error:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get direct reports for an employee
+  app.get("/api/employees/:id/reports", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const reports = await storage.getDirectReports(id);
+      return res.json(reports);
+    } catch (error) {
+      console.error("Get direct reports error:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get employee by user ID (for auth integration)
+  app.get("/api/employees/by-user/:userId", async (req: Request, res: Response) => {
+    try {
+      const { userId } = req.params;
+      const employee = await storage.getEmployeeByUserId(userId);
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found for user" });
+      }
+      return res.json(employee);
+    } catch (error) {
+      console.error("Get employee by user error:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ============================================================
   // Finance Module - Reconciliation Routes
   // ============================================================
 
