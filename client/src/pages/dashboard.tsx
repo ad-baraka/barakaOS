@@ -1,12 +1,15 @@
 import { StatusCard } from "@/components/status-card";
 import { ReviewCycleCard } from "@/components/review-cycle-card";
 import { CheckCircle2, Clock, Target } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold">Welcome back, John</h1>
+        <h1 className="text-3xl font-semibold">Welcome back, {user?.firstName || "User"}</h1>
         <p className="text-muted-foreground mt-1">
           Here's your performance review overview
         </p>
