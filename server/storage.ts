@@ -67,6 +67,15 @@ export class MemStorage implements IStorage {
     this.initializeMockUsers();
   }
 
+  private linkUserToEmployee(employeeId: string, userId: string) {
+    const employee = this.employees.get(employeeId);
+    if (employee) {
+      employee.userId = userId;
+      employee.isLinkedToUser = true;
+      this.employees.set(employeeId, employee);
+    }
+  }
+
   private initializeEmployees() {
     for (const emp of EMPLOYEES_DATA) {
       const nameParts = emp.name.split(' ');
@@ -91,41 +100,43 @@ export class MemStorage implements IStorage {
   }
 
   private initializeMockUsers() {
-    // Super Admin - can see everything
+    // Super Admin - can see everything (linked to CEO Feras Jalbout for demo)
     const superAdmin: User = {
       id: "1",
       email: "superadmin@baraka.com",
       password: "admin123",
-      firstName: "Super",
-      lastName: "Admin",
+      firstName: "Feras",
+      lastName: "Jalbout",
       role: "super_admin",
       department: null,
       departments: null,
-      designation: "System Administrator",
+      designation: "CEO",
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     this.users.set(superAdmin.id, superAdmin);
+    this.linkUserToEmployee("EMP0015", "1"); // Link Feras Jalbout
 
-    // Engineering Admin - has access to Engineering AND Performance
+    // Engineering Admin - linked to Anil Dabas (Director of Engineering with multiple reports)
     const engineeringAdmin: User = {
       id: "2",
       email: "eng.admin@baraka.com",
       password: "eng123",
-      firstName: "John",
-      lastName: "Engineer",
+      firstName: "Anil",
+      lastName: "Dabas",
       role: "admin",
       department: "engineering",
       departments: JSON.stringify(["engineering", "performance"]),
-      designation: "Engineering Manager",
+      designation: "Director of Engineering",
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     this.users.set(engineeringAdmin.id, engineeringAdmin);
+    this.linkUserToEmployee("EMP0005", "2"); // Link Anil Dabas
 
-    // HR Admin
+    // HR Admin - not linked to employee (HR department not in employee data)
     const hrAdmin: User = {
       id: "3",
       email: "hr.admin@baraka.com",
@@ -142,30 +153,31 @@ export class MemStorage implements IStorage {
     };
     this.users.set(hrAdmin.id, hrAdmin);
 
-    // Marketing Admin
+    // Marketing Admin - linked to Rafay Qureshi (Growth leader with reports)
     const marketingAdmin: User = {
       id: "4",
       email: "marketing.admin@baraka.com",
       password: "mkt123",
-      firstName: "Mike",
-      lastName: "Marketing",
+      firstName: "Rafay",
+      lastName: "Qureshi",
       role: "admin",
-      department: "marketing",
-      departments: JSON.stringify(["marketing"]),
-      designation: "Marketing Director",
+      department: "growth",
+      departments: JSON.stringify(["growth", "marketing"]),
+      designation: "Growth Lead",
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     this.users.set(marketingAdmin.id, marketingAdmin);
+    this.linkUserToEmployee("EMP0029", "4"); // Link Rafay Qureshi
 
-    // Compliance Admin
+    // Compliance Admin - linked to Muna Salah (Compliance)
     const complianceAdmin: User = {
       id: "5",
       email: "compliance.admin@baraka.com",
       password: "comp123",
-      firstName: "Carol",
-      lastName: "Compliance",
+      firstName: "Muna",
+      lastName: "Salah",
       role: "admin",
       department: "compliance",
       departments: JSON.stringify(["compliance"]),
@@ -175,23 +187,25 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
     };
     this.users.set(complianceAdmin.id, complianceAdmin);
+    this.linkUserToEmployee("EMP0021", "5"); // Link Muna Salah
 
-    // Regular member (Engineering)
+    // Engineering Member - linked to David Farg (Engineering Manager with direct reports)
     const engMember: User = {
       id: "6",
       email: "dev@baraka.com",
       password: "dev123",
-      firstName: "Dave",
-      lastName: "Developer",
+      firstName: "David",
+      lastName: "Farg",
       role: "member",
       department: "engineering",
-      departments: JSON.stringify(["engineering"]),
-      designation: "Software Developer",
+      departments: JSON.stringify(["engineering", "performance"]),
+      designation: "Engineering Manager",
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     this.users.set(engMember.id, engMember);
+    this.linkUserToEmployee("EMP0012", "6"); // Link David Farg
   }
 
   async getUser(id: string): Promise<User | undefined> {
