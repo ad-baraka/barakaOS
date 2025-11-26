@@ -3,15 +3,15 @@ import { Code2, GitBranch, Bug, Rocket } from "lucide-react";
 
 export default function EngineeringDashboard() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Engineering Dashboard</h1>
+        <h1 className="text-3xl font-semibold">Engineering Dashboard</h1>
         <p className="text-muted-foreground mt-1">
           Track development progress and engineering metrics
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active PRs</CardTitle>
