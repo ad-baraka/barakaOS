@@ -8,7 +8,8 @@ Baraka OS is a full-stack TypeScript application featuring a React frontend with
 ### Tech Stack
 - **Frontend**: React 18, Vite, TailwindCSS, Radix UI components
 - **Backend**: Express.js, TypeScript
-- **Database**: PostgreSQL (Drizzle ORM configured, currently using in-memory storage)
+- **Database**: PostgreSQL with Drizzle ORM (supports Replit DB, AWS RDS, Neon, or any PostgreSQL)
+- **Authentication**: Bcrypt password hashing
 - **Build Tools**: Vite, esbuild, tsx
 
 ### Project Structure
@@ -23,52 +24,84 @@ Baraka OS is a full-stack TypeScript application featuring a React frontend with
 ├── server/              # Express backend
 │   ├── index.ts         # Server entry point
 │   ├── routes.ts        # API routes
-│   ├── storage.ts       # Data storage layer (in-memory)
+│   ├── db.ts            # Database connection
+│   ├── pg-storage.ts    # PostgreSQL storage layer
+│   ├── migrate.ts       # Migration runner
+│   ├── seed.ts          # Database seeder
 │   └── vite.ts          # Vite dev server setup
 ├── shared/              # Shared code between client/server
-│   ├── modules.ts       # Centralized module/department configuration (single source of truth)
-│   ├── schema.ts        # Database schema and types
+│   ├── modules.ts       # Centralized module/department configuration
+│   ├── schema.ts        # Database schema (Drizzle ORM)
+│   ├── employees-data.ts # Employee directory data
 │   └── templates.ts     # Template definitions
-└── attached_assets/     # Static assets
+├── migrations/          # SQL migration files
+└── DATABASE.md          # Database setup documentation
 ```
+
+## Database Setup
+
+### Environment Variable
+Set `DATABASE_URL` to connect to any PostgreSQL database:
+
+```bash
+# Replit (default)
+DATABASE_URL=postgresql://user:pass@host:5432/db
+
+# AWS RDS
+DATABASE_URL=postgresql://admin:password@mydb.xxxxx.rds.amazonaws.com:5432/baraka_os
+
+# Neon Serverless
+DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/baraka_os?sslmode=require
+```
+
+### Database Commands
+```bash
+npm run db:migrate    # Run migrations (create tables)
+npm run db:seed       # Seed with initial data
+npm run db:setup      # Run both migrate + seed
+npm run db:push       # Quick schema sync (development)
+npm run db:generate   # Generate new migration files
+```
+
+### Database Tables
+- **Core**: users, employees, departments, user_departments
+- **Performance**: review_cycles, review_participants, review_responses, goals, goal_updates, feedback
+- **HR**: invitations, new_joiners, document_templates
+- **Finance**: reconciliation_runs, reconciliation_results
+- **System**: audit_logs
+
+See `DATABASE.md` for complete setup instructions.
 
 ## Development Setup
 
 ### Running Locally
-The application runs on port 5000 in both development and production:
-- Development: `npm run dev` - Starts Express server with Vite dev middleware
-- Production: `npm run build && npm start`
-
-### Environment Configuration
-- **Host**: The dev server is configured to accept connections from 0.0.0.0
-- **Port**: 5000 (fixed for Replit)
-- **HMR**: Configured for hot module replacement
-
-## Database
-The project is configured to use PostgreSQL with Drizzle ORM. Currently, it uses in-memory storage for development. The schema is defined in `shared/schema.ts`.
-
-To push the schema to a database:
 ```bash
-npm run db:push
+npm run dev    # Start development server on port 5000
 ```
 
-## Test Accounts
-The application includes pre-configured test accounts:
-- **Super Admin**: superadmin@baraka.com / admin123
-- **HR Admin**: hr.admin@baraka.com / hr123
-- **Engineering Admin**: eng.admin@baraka.com / eng123
-- **Marketing Admin**: marketing.admin@baraka.com / mkt123
-- **Compliance Admin**: compliance.admin@baraka.com / comp123
-- **Engineering Member**: dev@baraka.com / dev123
+### Production
+```bash
+npm run build && npm start
+```
 
-## Deployment
-The project is configured for Replit Autoscale deployment:
-- Build: `npm run build`
-- Start: `npm start`
+## Authentication
+
+All passwords are hashed with bcrypt (cost factor 10).
+
+### Default Accounts
+| Email | Name | Role |
+|-------|------|------|
+| feras@getbaraka.com | Feras Jalbout (CEO) | Super Admin |
+| anil.dabas@getbaraka.com | Anil Dabas | Member |
+| david@getbaraka.com | David Farg | Member |
+| rafay@getbaraka.com | Rafay Qureshi | Member |
+| muna@getbaraka.com | Muna Salah | Member |
+
+**Default password for all accounts: Password@123**
 
 ## Centralized Modules Configuration
 
-The application uses a single source of truth for department/module configuration in `shared/modules.ts`. This ensures consistency across the entire application.
+The application uses a single source of truth for department/module configuration in `shared/modules.ts`.
 
 ### How to Add a New Module/Department
 
@@ -100,77 +133,41 @@ The application uses a single source of truth for department/module configuratio
 - Supports multi-department access (users can belong to multiple departments)
 - Super admins can access all modules
 
+## Employee Database
+
+Centralized employee directory with 38 employees:
+- File: `shared/employees-data.ts`
+- Includes manager relationships (managerId)
+- All employees have @getbaraka.com email addresses
+- Departments: Engineering, Design, Product, Executive, Growth, Finance, Compliance, Customer Support
+
 ## Recent Changes (November 26, 2025)
-- Installed all project dependencies
-- Configured Vite for Replit environment (host: 0.0.0.0, port: 5000)
-- Set up development workflow
-- Configured deployment settings
-- Added missing `nanoid` dependency
-- Added `papaparse` for CSV parsing in finance reconciliation
-- Updated Finance Reconciliation page layout: horizontal "Value Date Filter" with calendar icon and date picker
-- Applied consistent UI styling across all dashboard tabs:
-  - All page titles use `text-3xl font-semibold`
-  - Consistent `space-y-6` spacing between sections
-  - Responsive grid layouts: `grid-cols-1 md:grid-cols-2 lg:grid-cols-4`
-  - Consistent `mt-1` spacing for subtitles
-- Implemented multi-department selection in User Management:
-  - Users can now be assigned to multiple departments (e.g., Engineering AND Performance)
-  - Department selection uses checkboxes for multi-select
-  - Table displays multiple departments as separate badges
-  - Schema updated to store departments as JSON array alongside legacy department field
-  - Example: John Engineer has access to both Engineering and Performance modules
-- Created centralized modules configuration system:
-  - Single source of truth in `shared/modules.ts`
-  - `DEPARTMENTS` array derived from centralized config
-  - `DEPARTMENT_LABELS` derived from centralized config
-  - Auth context dynamically builds module-to-department mapping
-  - User Management imports labels from centralized config
 
-### Centralized Employee Database (November 26, 2025)
-- Created `shared/employees-data.ts` with 38 employees including manager relationships
-- Employee data includes: employeeId, name, email, department, position, manager, managerId
-- All employees have work emails from the @getbaraka.com domain
-- New departments added: Design, Product, Executive, Growth, Customer Support, Finance
-- API endpoints:
-  - `GET /api/employees/search?q=<query>` - Search employees by name
-  - `GET /api/employees/:id` - Get employee by employee ID
-  - `GET /api/employees/:id/reports` - Get direct reports for a manager
-  - `GET /api/employees/by-user/:userId` - Get employee linked to a user account
+### PostgreSQL Database Migration
+- Migrated from in-memory storage to PostgreSQL
+- Created comprehensive schema with 16 tables
+- Implemented proper foreign key relationships and indexes
+- Added bcrypt password hashing for security
+- Created migration files in `./migrations` folder
+- Database now supports external hosting (AWS RDS, Neon, etc.)
 
-### User Accounts (November 26, 2025)
-- All 38 employees have user accounts created automatically from employee data
-- Super Admin: Feras Jalbout (CEO, EMP0015) - feras@getbaraka.com
-- Default password for all users: **Password@123**
-- User accounts are linked to employee records via userId
+### Database Scripts
+- `npm run db:migrate` - Run migrations on any PostgreSQL database
+- `npm run db:seed` - Seed initial employee and user data
+- `npm run db:setup` - Full setup (migrate + seed)
 
-### User Management - Employee Search
-- When creating a new user, admins search the employee directory
-- Selecting an employee auto-populates: Email, First Name, Last Name, Department, Designation
-- Email and name fields are read-only when populated from employee data
-- Password is optional - defaults to Password@123 if not provided
-- Only role needs to be selected manually
+### Performance Dashboard & Manager Review
+- Dashboard displays logged-in user's actual first name
+- Manager Review shows actual manager details from employee database
+- Avatar initials generated from manager's name
 
-### Performance Module - Team Reviews
-- Manager Dashboard now shows actual direct reports based on logged-in user's employee ID
-- Dynamically calculates completion rates based on real team members
-- Empty states for users without employee profiles or direct reports
+### User Management
+- Employee search auto-populates user fields
+- Email and name fields read-only when populated from employee data
+- Multi-department selection with checkboxes
 
-### Performance Dashboard & Manager Review (November 26, 2025)
-- Performance Dashboard now displays the logged-in user's actual first name in the welcome message
-- Manager Review page shows the actual manager details from employee database:
-  - Manager name fetched based on logged-in user's managerId
-  - Manager position/designation displayed dynamically
-  - Manager department shown when available
-  - Avatar initials generated from manager's name
-- Example: When Anil Dabas logs in, Manager Review shows "Feras Jalbout" (CEO, Executive Team)
-
-### Sample Login Accounts
-| Email | Name | Department | Role |
-|-------|------|------------|------|
-| feras@getbaraka.com | Feras Jalbout (CEO) | Executive | Super Admin |
-| anil.dabas@getbaraka.com | Anil Dabas | Engineering | Member |
-| david@getbaraka.com | David Farg | Engineering | Member |
-| rafay@getbaraka.com | Rafay Qureshi | Growth | Member |
-| muna@getbaraka.com | Muna Salah | Compliance | Member |
-
-**Default password for all accounts: Password@123**
+## Deployment
+The project is configured for Replit Autoscale deployment:
+- Build: `npm run build`
+- Start: `npm start`
+- Database: Set `DATABASE_URL` environment variable
