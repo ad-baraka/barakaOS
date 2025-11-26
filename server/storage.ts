@@ -197,13 +197,29 @@ export class MemStorage implements IStorage {
     const user = this.users.get(id);
     if (!user) return undefined;
 
+    const hasDepartmentsUpdate = 'departments' in updates;
+    const newDepartments = hasDepartmentsUpdate ? updates.departments || [] : null;
+    
     const updatedUser: User = {
       ...user,
-      ...updates,
-      department: updates.departments?.[0] || updates.department || user.department,
-      departments: updates.departments ? JSON.stringify(updates.departments) : user.departments,
+      email: updates.email ?? user.email,
+      firstName: updates.firstName ?? user.firstName,
+      lastName: updates.lastName ?? user.lastName,
+      role: updates.role ?? user.role,
+      designation: updates.designation ?? user.designation,
+      department: hasDepartmentsUpdate 
+        ? (newDepartments && newDepartments.length > 0 ? newDepartments[0] : null)
+        : (updates.department ?? user.department),
+      departments: hasDepartmentsUpdate
+        ? (newDepartments && newDepartments.length > 0 ? JSON.stringify(newDepartments) : null)
+        : user.departments,
       updatedAt: new Date(),
     };
+    
+    if (updates.password) {
+      updatedUser.password = updates.password;
+    }
+    
     this.users.set(id, updatedUser);
     return toSafeUser(updatedUser);
   }

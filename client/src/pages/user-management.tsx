@@ -54,11 +54,20 @@ const DEPARTMENT_LABELS: Record<Department, string> = {
 };
 
 function parseDepartments(user: SafeUser): Department[] {
-  if (user.departments) {
-    try {
-      return JSON.parse(user.departments as string) as Department[];
-    } catch {
-      return user.department ? [user.department as Department] : [];
+  const depts = user.departments;
+  if (depts) {
+    if (Array.isArray(depts)) {
+      return depts as Department[];
+    }
+    if (typeof depts === 'string') {
+      try {
+        const parsed = JSON.parse(depts);
+        if (Array.isArray(parsed)) {
+          return parsed as Department[];
+        }
+      } catch {
+        // Fall through to legacy department
+      }
     }
   }
   return user.department ? [user.department as Department] : [];
