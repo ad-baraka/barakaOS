@@ -155,6 +155,15 @@ The application uses a single source of truth for department/module configuratio
 - Dynamically calculates completion rates based on real team members
 - Empty states for users without employee profiles or direct reports
 
+### Performance Dashboard & Manager Review (November 26, 2025)
+- Performance Dashboard now displays the logged-in user's actual first name in the welcome message
+- Manager Review page shows the actual manager details from employee database:
+  - Manager name fetched based on logged-in user's managerId
+  - Manager position/designation displayed dynamically
+  - Manager department shown when available
+  - Avatar initials generated from manager's name
+- Example: When Anil Dabas logs in, Manager Review shows "Feras Jalbout" (CEO, Executive Team)
+
 ### Sample Login Accounts
 | Email | Name | Department | Role |
 |-------|------|------------|------|

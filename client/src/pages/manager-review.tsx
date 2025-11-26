@@ -6,20 +6,73 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Share2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/auth-context";
+
+interface EmployeeData {
+  employeeId: string;
+  name: string;
+  email: string;
+  department: string | null;
+  position?: string;
+  manager: string | null;
+  managerId: string | null;
+}
 
 export default function ManagerReview() {
   const [managerFeedback, setManagerFeedback] = useState("");
   const [strengths, setStrengths] = useState("");
   const [improvements, setImprovements] = useState("");
   const [overallRating, setOverallRating] = useState<number>(0);
+  const [managerData, setManagerData] = useState<EmployeeData | null>(null);
+  const [currentEmployee, setCurrentEmployee] = useState<EmployeeData | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    async function fetchManagerData() {
+      if (!user?.id) return;
+      
+      try {
+        const empResponse = await fetch(`/api/employees/by-user/${user.id}`);
+        if (empResponse.ok) {
+          const empData = await empResponse.json();
+          setCurrentEmployee(empData);
+          
+          if (empData.managerId) {
+            const managerResponse = await fetch(`/api/employees/${empData.managerId}`);
+            if (managerResponse.ok) {
+              const manager = await managerResponse.json();
+              setManagerData(manager);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching manager data:", error);
+      }
+    }
+    
+    fetchManagerData();
+  }, [user?.id]);
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const managerName = managerData?.name || "No Manager Assigned";
+  const managerPosition = managerData?.position || "Manager";
+  const managerDepartment = managerData?.department || "";
 
   const handleShare = () => {
     toast({
       title: "Review shared",
-      description: "The review has been shared with Sarah Chen.",
+      description: `The review has been shared with ${managerName}.`,
     });
   };
 
@@ -31,12 +84,12 @@ export default function ManagerReview() {
             <div className="flex items-center gap-4 flex-1">
               <Avatar className="h-16 w-16">
                 <AvatarImage src="" />
-                <AvatarFallback>SC</AvatarFallback>
+                <AvatarFallback>{managerData ? getInitials(managerName) : "NA"}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <CardTitle>Sarah Chen - Q4 2025 Review</CardTitle>
+                <CardTitle>{managerName} - Q4 2025 Review</CardTitle>
                 <CardDescription className="mt-1">
-                  Senior Engineer • Engineering Team
+                  {managerPosition}{managerDepartment ? ` • ${managerDepartment} Team` : ""}
                 </CardDescription>
               </div>
             </div>
