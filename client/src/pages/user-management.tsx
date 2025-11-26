@@ -336,6 +336,7 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
     
     setFormData({
       ...formData,
+      email: employee.email || "",
       firstName: employee.firstName,
       lastName: employee.lastName,
       designation: employee.position || "",
@@ -356,16 +357,13 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
     e.preventDefault();
     const data: CreateUser = {
       email: formData.email,
-      password: formData.password,
+      password: formData.password || "Password@123",
       firstName: formData.firstName,
       lastName: formData.lastName,
       role: formData.role,
       departments: formData.role === "super_admin" ? [] : formData.departments,
       designation: formData.designation,
     };
-    if (!user && !data.password) {
-      return;
-    }
     if (user && !formData.password) {
       delete (data as any).password;
     }
@@ -511,12 +509,19 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
                 placeholder="Enter email address"
+                readOnly={!isEditMode && !!selectedEmployee}
+                className={!isEditMode && selectedEmployee ? "bg-muted" : ""}
               />
+              {!isEditMode && selectedEmployee && (
+                <p className="text-xs text-muted-foreground">
+                  Email populated from employee directory
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">
-                Password {user && "(leave blank to keep current)"}
+                Password {user ? "(leave blank to keep current)" : "(optional)"}
               </Label>
               <Input
                 id="password"
@@ -525,10 +530,14 @@ function UserForm({ user, onSubmit, isSubmitting }: UserFormProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                required={!user}
                 minLength={6}
-                placeholder={user ? "Leave blank to keep current" : "Min 6 characters"}
+                placeholder={user ? "Leave blank to keep current" : "Defaults to Password@123"}
               />
+              {!user && (
+                <p className="text-xs text-muted-foreground">
+                  Leave blank to use default password: Password@123
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

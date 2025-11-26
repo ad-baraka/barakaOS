@@ -84,15 +84,17 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 p-4 bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground mb-2 font-medium">Test Accounts:</p>
+            <p className="text-sm text-muted-foreground mb-2 font-medium">Sample Accounts:</p>
             <div className="text-xs text-muted-foreground space-y-1">
-              <p><strong>Super Admin:</strong> superadmin@baraka.com / admin123</p>
-              <p><strong>HR Admin:</strong> hr.admin@baraka.com / hr123</p>
-              <p><strong>Engineering Admin:</strong> eng.admin@baraka.com / eng123</p>
-              <p><strong>Marketing Admin:</strong> marketing.admin@baraka.com / mkt123</p>
-              <p><strong>Compliance Admin:</strong> compliance.admin@baraka.com / comp123</p>
-              <p><strong>Engineering Member:</strong> dev@baraka.com / dev123</p>
+              <p><strong>Super Admin (CEO):</strong> feras@getbaraka.com</p>
+              <p><strong>Engineering:</strong> anil.dabas@getbaraka.com</p>
+              <p><strong>Engineering:</strong> david@getbaraka.com</p>
+              <p><strong>Growth:</strong> rafay@getbaraka.com</p>
+              <p><strong>Compliance:</strong> muna@getbaraka.com</p>
             </div>
+            <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+              <strong>Default password for all users:</strong> Password@123
+            </p>
           </div>
         </CardContent>
       </Card>
