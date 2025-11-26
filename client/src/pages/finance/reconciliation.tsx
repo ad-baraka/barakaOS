@@ -334,8 +334,8 @@ export default function ReconciliationPage() {
           </div>
 
           <div className="flex items-end gap-4">
-            <div className="space-y-3">
-              <Label htmlFor="value-date-filter">Value Date Filter</Label>
+            <div className="space-y-4">
+              <Label htmlFor="value-date-filter" className="block">Value Date Filter</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
