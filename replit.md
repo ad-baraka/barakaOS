@@ -149,7 +149,9 @@ Centralized employee directory with 38 employees:
 - Implemented proper foreign key relationships and indexes
 - Added bcrypt password hashing for security
 - Created migration files in `./migrations` folder
-- Database now supports external hosting (AWS RDS, Neon, etc.)
+- Database supports both Neon (WebSocket) and AWS RDS (TCP) with auto-detection
+- Dual driver support: @neondatabase/serverless for Neon, node-postgres (pg) for RDS
+- SSL auto-configuration for AWS RDS connections
 
 ### Database Scripts
 - `npm run db:migrate` - Run migrations on any PostgreSQL database
