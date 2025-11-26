@@ -1,0 +1,269 @@
+Product Requirements Document (PRD)
+Product Name: Baraka Perform (placeholder — can be renamed)
+Owner: Product Management
+Version: v1.0
+Date: 17 Nov 2025
+1. Overview
+
+Baraka Perform is a lightweight, modern, and high-signal performance review system designed for small tech companies (20–200 employees). It enables managers and employees to run structured, fair, and efficient performance evaluations—quarterly or bi-annually—without creating unnecessary administrative overhead.
+
+The system focuses on clarity, accountability, and action, using a simple workflow:
+Prepare → Assess → Review → Track
+
+2. Objectives & Goals
+Primary Objectives
+
+Streamline performance reviews with a simple workflow that avoids heavy HR tooling complexity.
+
+Increase feedback quality through structured templates and guided prompts.
+
+Enable managers to make better decisions around growth, compensation, and development.
+
+Provide visibility for employees into expectations and progress.
+
+Create lightweight documentation suitable for audits, promotions, and HR processes.
+
+Success Metrics (V1)
+
+90% of employees complete their review cycle on time.
+
+Manager satisfaction score ≥ 8/10.
+
+Average completion time under 30 minutes.
+
+≥ 80% of employees receive at least one development action item.
+
+Admin effort < 2 hours per cycle.
+
+3. Target Users
+Primary Users
+
+Employees (submit self-reviews)
+
+Managers (evaluate reports, consolidate feedback)
+
+HR/Admin (configure cycles, track completion)
+
+Secondary Users
+
+Leadership (review summaries, make promotion/compensation decisions)
+
+4. User Flows
+4.1 Admin Flow
+
+HR creates a new review cycle
+
+Cycle name, start/end dates
+
+Participants (auto-import from org chart)
+
+Manager mappings
+
+Review template selection
+
+System sends auto-notifications to all participants.
+
+HR tracks completion status via dashboard.
+
+HR closes the cycle & exports reports if needed.
+
+4.2 Employee Flow
+
+Employee receives notification: "Your performance review is open."
+
+Employee completes self-review form.
+
+Optional: send peer-feedback requests
+
+Employee submits final answers.
+
+Employee receives manager review & schedules 1:1 meeting.
+
+4.3 Manager Flow
+
+Manager receives alerts when employees submit self-reviews.
+
+Manager views self-review + peer feedback in a consolidated panel.
+
+Manager fills out evaluation form:
+
+Performance rating
+
+Strengths
+
+Areas of improvement
+
+Development plan
+
+Manager shares the review with the employee.
+
+1:1 meeting logged in the system (notes optional).
+
+5. Core Features (V1 Scope)
+5.1 Review Cycle Management
+
+Create/edit/delete review cycles
+
+Assign templates to cycles
+
+Automatically import organizational reporting hierarchy
+
+Dashboard: status (Not started, In progress, Submitted, Completed)
+
+Export cycle summaries (PDF/CSV)
+
+5.2 Review Templates (Configurable)
+
+Admin can choose from or customize templates:
+
+Template Components:
+
+Competency ratings (1–5 scale)
+
+Open text questions (e.g., "What did you achieve this period?")
+
+Development goals
+
+Values alignment
+
+Outcome/impact scoring
+
+Manager overall rating
+
+Default templates:
+
+Quarterly Lite
+
+Bi-annual Full
+
+Manager-only calibration
+
+5.3 Self-Review Workflow
+
+Clean interface with sections
+
+Autosave
+
+Guided prompts (appear as tooltips)
+
+Add attachments (optional)
+
+Peer feedback requests (optional, V1.1)
+
+5.4 Manager Review
+
+Consolidated employee view:
+
+Self-review
+
+Past cycle summary
+
+Peer feedback
+
+Manager rating & written assessment
+
+Calibration option (V1.1)
+
+Share review with employee
+
+Lock after sharing
+
+5.5 Notifications
+
+Slack + Email
+
+Triggers:
+
+Cycle launched
+
+Self-review due in X days
+
+Manager review pending
+
+Review shared
+
+Cycle closing in X days
+
+5.6 Employee Growth & Action Plans
+
+Every completed review generates:
+
+3 Strengths
+
+3 Focus areas
+
+3 Action items (goals)
+
+(Editable by employee + manager)
+
+5.7 Reporting
+
+Cycle completion rates
+
+Rating distributions
+
+Promotion readiness snapshots
+
+Export: CSV/PDF
+
+6. Non-Functional Requirements
+Performance
+
+Pages load < 1 second
+
+Autosave every 10 seconds
+
+Security
+
+Role-based access control (Employee, Manager, HR, Admin)
+
+GDPR compliant
+
+Encrypted data at rest and in transit
+
+Scalability
+
+Support up to 1000 employees with no slowdown
+
+Audit & Compliance
+
+Version history for reviews
+
+Change logs for ratings and comments
+
+7. Technical Requirements (V1)
+Platform
+
+Web app (responsive)
+
+Backend REST API
+
+Authentication via SSO (Google/Microsoft) – V1.1
+
+PostgreSQL
+
+Optional integration: HRIS export/import (CSV first)
+
+Data Model (high level)
+
+User
+
+ManagerMapping
+
+ReviewCycle
+
+ReviewTemplate
+
+Review (Self, Manager)
+
+PeerFeedback (V1.1)
+
+GrowthPlan
+
+8. Constraints
+
+Must remain lightweight — total end-to-end experience ≤ 30 minutes.
+
+Minimal implementation complexity to allow fast release (6–8 weeks).
+
+Avoid over-engineering (no 360-feedback in V1).
