@@ -16,9 +16,21 @@ Baraka OS is a full-stack TypeScript application featuring a React frontend with
 ```
 ├── client/              # React frontend
 │   ├── src/
-│   │   ├── components/  # UI components (shadcn/ui)
+│   │   ├── components/  # UI components organized by module
+│   │   │   ├── ui/          # shadcn/ui base components
+│   │   │   ├── shared/      # App-wide shared components (sidebar, theme)
+│   │   │   ├── hr/          # HR module components
+│   │   │   ├── performance/ # Performance module components
+│   │   │   ├── marketing/   # Marketing module components
+│   │   │   ├── finance/     # Finance module components
+│   │   │   └── [module]/    # Other module component folders
+│   │   ├── pages/       # Application pages organized by module
+│   │   │   ├── hr/          # HR pages (dashboard, documents)
+│   │   │   ├── performance/ # Performance pages (dashboard, reviews)
+│   │   │   ├── marketing/   # Marketing pages
+│   │   │   ├── finance/     # Finance pages
+│   │   │   └── [module]/    # Other module page folders
 │   │   ├── contexts/    # React contexts (auth, invitations)
-│   │   ├── pages/       # Application pages
 │   │   └── App.tsx      # Main application component
 │   └── index.html
 ├── server/              # Express backend
@@ -125,8 +137,10 @@ The application uses a single source of truth for department/module configuratio
    - Auth context module-to-department mapping
 
 3. Manual updates needed:
-   - Add the sidebar section in `client/src/components/app-sidebar.tsx`
-   - Create the page components for the new module
+   - Add the sidebar section in `client/src/components/shared/app-sidebar.tsx`
+   - Create the component folder in `client/src/components/[module]/` with index.ts
+   - Create the page folder in `client/src/pages/[module]/` with index.ts
+   - Add routes in `client/src/App.tsx`
 
 ### Module Access Control
 - Uses `canAccessModule(moduleId)` function from auth context
@@ -142,6 +156,13 @@ Centralized employee directory with 38 employees:
 - Departments: Engineering, Design, Product, Executive, Growth, Finance, Compliance, Customer Support
 
 ## Recent Changes (November 26, 2025)
+
+### Module-Based Folder Organization
+- Reorganized all components into module-specific folders (components/[module]/)
+- Reorganized all pages into module-specific folders (pages/[module]/)
+- Shared components (sidebar, theme, dialogs) moved to components/shared/
+- Each module folder has an index.ts for clean barrel exports
+- Modules with dedicated folders: shared, hr, performance, marketing, finance, customer-service, compliance, engineering, analytics, design, product, growth, executive
 
 ### PostgreSQL Database Migration
 - Migrated from in-memory storage to PostgreSQL
