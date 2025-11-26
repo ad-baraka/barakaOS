@@ -125,3 +125,33 @@ The application uses a single source of truth for department/module configuratio
   - `DEPARTMENT_LABELS` derived from centralized config
   - Auth context dynamically builds module-to-department mapping
   - User Management imports labels from centralized config
+
+### Centralized Employee Database (November 26, 2025)
+- Created `shared/employees-data.ts` with 38 employees including manager relationships
+- Employee data includes: employeeId, name, department, position, manager, managerId
+- New departments added: Design, Product, Executive, Growth
+- API endpoints:
+  - `GET /api/employees/search?q=<query>` - Search employees by name
+  - `GET /api/employees/:id` - Get employee by employee ID
+  - `GET /api/employees/:id/reports` - Get direct reports for a manager
+  - `GET /api/employees/by-user/:userId` - Get employee linked to a user account
+
+### User Management - Employee Search
+- When creating a new user, admins search the employee directory
+- Selecting an employee auto-populates: First Name, Last Name, Department, Designation
+- Fields are read-only when populated from employee data
+- Only email, password, and role need to be entered manually
+
+### Performance Module - Team Reviews
+- Manager Dashboard now shows actual direct reports based on logged-in user's employee ID
+- Dynamically calculates completion rates based on real team members
+- Empty states for users without employee profiles or direct reports
+
+### Test Account to Employee Mapping
+| Test Account | Employee | Role | Direct Reports |
+|--------------|----------|------|----------------|
+| superadmin@baraka.com | Feras Jalbout (CEO) | Super Admin | Many executives |
+| eng.admin@baraka.com | Anil Dabas (Dir. Engineering) | Admin | David Farg, Fachrul, etc. |
+| marketing.admin@baraka.com | Rafay Qureshi (Growth Lead) | Admin | Hammad, Qamar, Shuming, etc. |
+| compliance.admin@baraka.com | Muna Salah (Compliance) | Admin | None |
+| dev@baraka.com | David Farg (Engineering Manager) | Member | Robert, Batuhan, Alexandre, etc. |
