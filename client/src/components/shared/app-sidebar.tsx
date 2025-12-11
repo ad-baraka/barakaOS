@@ -23,6 +23,10 @@ import {
   MessageSquare,
   Wallet,
   FileSpreadsheet,
+  AlertTriangle,
+  ScrollText,
+  Scale,
+  History,
 } from "lucide-react";
 import {
   Sidebar,
@@ -322,6 +326,62 @@ export function AppSidebar() {
                             <Link href="/compliance" data-testid="link-compliance-dashboard">
                               <LayoutDashboard className="h-4 w-4" />
                               <span>Dashboard</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="aml-dashboard">
+                          <SidebarMenuSubButton asChild isActive={location === "/compliance/aml"}>
+                            <Link href="/compliance/aml" data-testid="link-aml-dashboard">
+                              <ShieldCheck className="h-4 w-4" />
+                              <span>AML Dashboard</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="aml-alerts">
+                          <SidebarMenuSubButton asChild isActive={location === "/compliance/aml/alerts"}>
+                            <Link href="/compliance/aml/alerts" data-testid="link-aml-alerts">
+                              <AlertTriangle className="h-4 w-4" />
+                              <span>Alerts</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="aml-customers">
+                          <SidebarMenuSubButton asChild isActive={location === "/compliance/aml/customers"}>
+                            <Link href="/compliance/aml/customers" data-testid="link-aml-customers">
+                              <Users className="h-4 w-4" />
+                              <span>Customers</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="aml-rules">
+                          <SidebarMenuSubButton asChild isActive={location === "/compliance/aml/rules"}>
+                            <Link href="/compliance/aml/rules" data-testid="link-aml-rules">
+                              <Scale className="h-4 w-4" />
+                              <span>Rules Engine</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="aml-reports">
+                          <SidebarMenuSubButton asChild isActive={location === "/compliance/aml/reports"}>
+                            <Link href="/compliance/aml/reports" data-testid="link-aml-reports">
+                              <ScrollText className="h-4 w-4" />
+                              <span>Reports</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="aml-analytics">
+                          <SidebarMenuSubButton asChild isActive={location === "/compliance/aml/analytics"}>
+                            <Link href="/compliance/aml/analytics" data-testid="link-aml-analytics">
+                              <LineChart className="h-4 w-4" />
+                              <span>Analytics</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem key="aml-audit">
+                          <SidebarMenuSubButton asChild isActive={location === "/compliance/aml/audit"}>
+                            <Link href="/compliance/aml/audit" data-testid="link-aml-audit">
+                              <History className="h-4 w-4" />
+                              <span>Audit Log</span>
                             </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>

@@ -24,7 +24,16 @@ import FinanceDashboard from "@/pages/finance/dashboard";
 import FinanceReconciliation from "@/pages/finance/reconciliation";
 
 import { CustomerServiceDashboard } from "@/pages/customer-service";
-import { ComplianceDashboard } from "@/pages/compliance";
+import {
+  ComplianceDashboard,
+  AMLDashboard,
+  AMLAlerts,
+  AMLCustomers,
+  AMLRules,
+  AMLReports,
+  AMLAnalytics,
+  AMLAudit,
+} from "@/pages/compliance";
 import { EngineeringDashboard } from "@/pages/engineering";
 import { AnalyticsDashboard } from "@/pages/analytics";
 import SettingsPage from "@/pages/settings";
@@ -132,6 +141,27 @@ function Router() {
 
       <Route path="/compliance">
         <ProtectedRoute component={ComplianceDashboard} module="compliance" />
+      </Route>
+      <Route path="/compliance/aml">
+        <ProtectedRoute component={AMLDashboard} module="compliance" />
+      </Route>
+      <Route path="/compliance/aml/alerts">
+        <ProtectedRoute component={AMLAlerts} module="compliance" />
+      </Route>
+      <Route path="/compliance/aml/customers">
+        <ProtectedRoute component={AMLCustomers} module="compliance" />
+      </Route>
+      <Route path="/compliance/aml/rules">
+        <ProtectedRoute component={AMLRules} module="compliance" />
+      </Route>
+      <Route path="/compliance/aml/reports">
+        <ProtectedRoute component={AMLReports} module="compliance" />
+      </Route>
+      <Route path="/compliance/aml/analytics">
+        <ProtectedRoute component={AMLAnalytics} module="compliance" />
+      </Route>
+      <Route path="/compliance/aml/audit">
+        <ProtectedRoute component={AMLAudit} module="compliance" />
       </Route>
 
       <Route path="/engineering">
